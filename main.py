@@ -26,11 +26,8 @@ def quest1():
     suave = cv.GaussianBlur(imagem, (7, 7), 0)
     # Limiar adaptativo usando 21 pixels vizinhos mais próximos()
     bin1 = cv.adaptiveThreshold(suave, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 21, 5)
-    # Limiar adaptativo usando 21 pixels vizinhos mais próximos()
-    bin2 = cv.adaptiveThreshold(suave, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 21, 5)
     # impressão da imagem
     cv.imshow("Original / Binarizada", np.hstack([imagem, bin1]))
-    # cv.imshow("Binarização adaptativa da imagem", np.hstack([bin1, bin2]))
     cv.waitKey(0)
 
 
