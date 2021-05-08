@@ -10,15 +10,35 @@ Prof.º: Bruno Macchiavello
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
+import color_spaces as cp
+
+"""
+Primeiro passo (Detecção de pele)
+ -  Normalização do modelo RGB
+
+"""
+
+
+def boolstr_to_floatstr(x):
+    if x is True:
+        return 1
+    elif x is False:
+        return 0
+    else:
+        return x
 
 
 def quest1_2():
-    return
+    imagem = cv.imread('imagens/entrada/morf_test.png')
+    if cp.RGB_color_space(imagem) and cp.HSV_color_space(imagem):
+        print('Arquivos gerados com sucesso!')
+    else:
+        print('Erro ao gerar arquivos!')
 
 
 def quest1():
     # leitura da imagem
-    imagem = cv.imread('imagens/morf_test.png')
+    imagem = cv.imread('imagens/entrada/morf_test.png')
     # verificar se a imagem é colorida e passar para escala de cinza
     if len(imagem.shape) > 2:
         imagem = cv.cvtColor(imagem, cv.COLOR_BGR2GRAY)
@@ -29,6 +49,13 @@ def quest1():
     # impressão da imagem
     cv.imshow("Original / Binarizada", np.hstack([imagem, bin1]))
     cv.waitKey(0)
+    plt.figure(figsize=(12, 8))
+    plt.suptitle('Original')
+    plt.imshow(imagem, cmap='gray')
+    plt.show()
+    plt.suptitle('Binarizada')
+    plt.imshow(bin1, cmap='gray')
+    plt.show()
 
 
 def quest2():
@@ -67,4 +94,4 @@ def escolhe_questao():
 
 
 if __name__ == '__main__':
-    quest1()
+    quest1_2()
