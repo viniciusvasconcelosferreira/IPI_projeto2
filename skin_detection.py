@@ -1,14 +1,18 @@
 import numpy as np
 import math
+import cv2 as cv
 
 
 def skin_detection(imagem):
-    R = imagem[:, :, 0]
-    G = imagem[:, :, 1]
-    B = imagem[:, :, 2]
+    nova_imagem = np.copy(imagem)
+    nova_imagem = np.float32(nova_imagem) / 255
 
-    for i in range(0, len(imagem)):
-        for j in range(0, len(imagem[0])):
+    R = nova_imagem[:, :, 0]
+    G = nova_imagem[:, :, 1]
+    B = nova_imagem[:, :, 2]
+    result = B
+    for i in range(0, len(nova_imagem)):
+        for j in range(0, len(nova_imagem[0])):
             r = R[i][j] / R[i][j] + G[i][j] + B[i][j]
             g = G[i][j] / R[i][j] + G[i][j] + B[i][j]
 
@@ -19,18 +23,21 @@ def skin_detection(imagem):
 
             w = math.pow((r - 0.33), 2) + math.pow((g - 0.33), 2) > 0.001
 
-            up = ((R[i][j] - G[i][j]) + (R[i][j] - B[i][j])) / 2
-            down = math.sqrt(math.pow((R[i][j] - G[i][j]), 2) + ((R[i][j] - B) * (G[i][j] - B[i][j])))
+            up = (R[i][j] - ((G[i][j] / 2 + B[i][j] / 2)))
 
-            teta = math.acos(up / math.sqrt(down))
+            down = math.sqrt((R[i][j] - G[i][j]) ** 2 + (R[i][j] - B[i][j]) * (G[i][j] - B[i][j]))
 
-            if B[i][j] <= G[i][j]:
-                H = teta
-            elif B[i][j] > G[i][j]:
+            teta = math.acos(up / down)
+
+            if B[i][j] > G[i][j]:
                 H = 360.0 - teta
+            H = teta
 
             if np.all(np.logical_and((np.logical_and((np.logical_and((g < F1), (g > F2))), (w > 0.001))),
                                      (np.logical_or((H > 240), (H <= 20))))) == True:
                 skin = 1
             else:
                 skin = 0
+            result[i][j] = H
+
+    return (result * 255).astype(np.uint8)
