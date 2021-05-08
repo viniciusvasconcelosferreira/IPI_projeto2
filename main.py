@@ -12,6 +12,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import color_spaces as cp
 import skin_detection as sd
+from scipy import ndimage
+from skimage.feature import peak_local_max
+from skimage.morphology import watershed
 
 """
 Primeiro passo (Detecção de pele)
@@ -90,7 +93,57 @@ def quest2():
 
 
 def quest3():
-    return
+    # leitura da imagem
+    imagem = cv.imread('imagens/entrada/img_cells.jpg')
+    # verificar se a imagem é colorida e passar para escala de cinza
+    if len(imagem.shape) > 2:
+        imagem = cv.cvtColor(imagem, cv.COLOR_BGR2GRAY)
+    # aplicação blur para suavização da imagem com 7x7
+    suave = cv.GaussianBlur(imagem, (7, 7), 0)
+    # Limiar adaptativo usando 21 pixels vizinhos mais próximos
+    bin1 = cv.adaptiveThreshold(suave, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 21, 5)
+    # Limiar adaptativo usando 21 pixels vizinhos mais próximos (INVERTIDA)
+    bin2 = cv.adaptiveThreshold(suave, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 21, 5)
+    # impressão da imagem
+    cv.imwrite('imagens/saida/img_cells_binarizada.jpg', bin1)
+    cv.imwrite('imagens/saida/img_cells_binarizada_invertida.jpg', bin2)
+    # preenchimento dos espaços desconectados
+    gray = suave
+    darker = cv.equalizeHist(gray)
+    ret, thresh = cv.threshold(darker, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+    newimg = cv.bitwise_not(thresh)
+    contours, hierarchy = cv.findContours(newimg, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    for cnt in contours:
+        cv.drawContours(newimg, [cnt], 0, 255, -1)
+    cv.imwrite('imagens/saida/img_cells_binarizada_invertida_preenchimento.jpg', cv.bitwise_not(newimg))
+    nova_imagem = cv.imread('imagens/saida/img_cells_binarizada_invertida_preenchimento.jpg')
+    cinza = cv.cvtColor(nova_imagem, cv.COLOR_BGR2GRAY)
+    # segmentação watersheed
+    thresh = cv.threshold(cinza, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)[1]  # Limiar de Otsu
+    # Cálculo da distância euclidiana de cada pixel binário até o pixel zero mais próximo e encontro dos picos
+    mapeamento_distancia = ndimage.distance_transform_edt(thresh)
+    local_maximo = peak_local_max(mapeamento_distancia, indices=False, min_distance=20, labels=thresh)
+    # Execução da análise de componentes conectados e aplicação da segmentação watersheed
+    markers = ndimage.label(local_maximo, structure=np.ones((3, 3)))[0]
+    labels = watershed(-mapeamento_distancia, markers, mask=thresh)
+    area_total = 0
+    for label in np.unique(labels):
+        if label == 0:
+            continue
+
+        # Criação da máscara
+        mask = np.zeros(gray.shape, dtype="uint8")
+        mask[labels == label] = 255
+
+        # Encontro dos contornos e determinação da área do contorno
+        cnts = cv.findContours(mask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+        cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+        c = max(cnts, key=cv.contourArea)
+        area = cv.contourArea(c)
+        area_total += area
+        cv.drawContours(nova_imagem, [c], -1, (36, 255, 12), 4)
+    print(area_total)
+    cv.imwrite('imagens/saida/img_cells_segmentacao_watersheed.jpg', nova_imagem)
 
 
 def escolhe_questao():
@@ -121,4 +174,4 @@ def escolhe_questao():
 
 
 if __name__ == '__main__':
-    quest2()
+    quest3()
