@@ -9,24 +9,18 @@ Prof.º: Bruno Macchiavello
 
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
-import color_spaces as cp
-import skin_detection as sd
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.morphology import watershed
-
-"""
-Primeiro passo (Detecção de pele)
- -  Normalização do modelo RGB
-
-"""
+import skin_detection
 
 
 def quest1_2():
     imagem = cv.imread('imagens/entrada/morf_test.png')
-    median = cv.medianBlur(imagem, 5)
-    cv.imwrite('imagens/saida/morf_test_skin_detection.png', median)
+    nova_imagem = skin_detection.skin_detection_minimun_facial_features(imagem)
+    # cv.imshow("images", np.hstack([imagem, nova_imagem]))
+    cv.imshow("images", np.hstack([imagem, nova_imagem]))
+    cv.waitKey(0)
 
 
 def quest1():
@@ -174,4 +168,4 @@ def escolhe_questao():
 
 
 if __name__ == '__main__':
-    quest3()
+    quest1_2()
