@@ -12,15 +12,11 @@ import numpy as np
 from scipy import ndimage
 from skimage.feature import peak_local_max
 from skimage.morphology import watershed
-import skin_detection
+import funcoes
 
 
 def quest1_2():
-    imagem = cv.imread('imagens/entrada/morf_test.png')
-    nova_imagem = skin_detection.skin_detection_minimun_facial_features(imagem)
-    # cv.imshow("images", np.hstack([imagem, nova_imagem]))
-    cv.imshow("images", np.hstack([imagem, nova_imagem]))
-    cv.waitKey(0)
+    funcoes.improve_image_quality_compare_every_pixel()
 
 
 def quest1():
@@ -35,6 +31,7 @@ def quest1():
     bin1 = cv.adaptiveThreshold(suave, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 21, 5)
     # impressão da imagem
     cv.imwrite('imagens/saida/morf_test_binarizada.png', bin1)
+    quest1_2()
 
 
 def quest2():
@@ -168,4 +165,4 @@ def escolhe_questao():
 
 
 if __name__ == '__main__':
-    quest1_2()
+    escolhe_questao()
