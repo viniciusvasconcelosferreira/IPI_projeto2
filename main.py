@@ -137,32 +137,8 @@ def quest3():
     cv.imwrite('imagens/saida/img_cells_segmentacao_watersheed.jpg', nova_imagem)
 
 
-def escolhe_questao():
-    print('======== MENU DE OPÇÕES ========')
-    print('1 - QUESTÃO 1')
-    print('2 - QUESTÃO 2')
-    print('3 - QUESTÃO 3')
-    print('4 - Sair')
-    opcao = int(input('Escolha uma das opções acima: '))
-
-    while opcao < 1 or opcao > 4:
-        print('Opção Inválida!')
-        print('======== MENU DE OPÇÕES ========')
-        print('1 - QUESTÃO 1')
-        print('2 - QUESTÃO 2')
-        print('3 - QUESTÃO 3')
-        print('4 - Sair')
-        opcao = int(input('Escolha novamente uma das opções acima: '))
-
-    if opcao == 1:
-        quest1()
-    elif opcao == 2:
-        quest2()
-    elif opcao == 3:
-        quest3()
-    else:
-        print('Volte sempre!')
-
-
 if __name__ == '__main__':
-    escolhe_questao()
+    quest1()
+    quest1_2()
+    quest2()
+    quest3()
